@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const SignUpScreen: React.FC = ({ navigation }) => {
 
@@ -10,22 +11,36 @@ const SignUpScreen: React.FC = ({ navigation }) => {
     const [address, setAddress] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [secureTextEntry, setSecureTextEntry] = useState(true);
 
     const handleSignUp = async () => {
-        if (name && phoneNumber && email && password) {
-            const user = { name, phoneNumber, email, address, password };
-            await AsyncStorage.setItem('user', JSON.stringify(user));
-            navigation.navigate('SignIn');
-        } else {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+        if (!name || !phoneNumber || !email || !password) {
             setError('Please fill all mandatory fields');
+            return;
         }
+
+        if (!passwordRegex.test(password)) {
+            console.log(password);
+            setError('Password must contain at least one number, one capital letter, and one lowercase letter and atleast 7 digit long');
+            return;
+        }
+
+        const user = { name, phoneNumber, email, address, password };
+        await AsyncStorage.setItem('user', JSON.stringify(user));
+        navigation.navigate('SignIn');
+    };
+
+    const toggleSecureTextEntry = () => {
+        setSecureTextEntry(!secureTextEntry);
     };
 
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.form}>
                 <Text style={styles.login}>Create New Account</Text>
-                
+
                 <View style={styles.inputContainer}>
                     <TextInput
                         placeholder="Name"
@@ -36,7 +51,7 @@ const SignUpScreen: React.FC = ({ navigation }) => {
                     />
                     <Text style={styles.mandatoryMark}>*</Text>
                 </View>
-                
+
                 <View style={styles.inputContainer}>
                     <TextInput
                         placeholder="PhoneNumber"
@@ -70,18 +85,23 @@ const SignUpScreen: React.FC = ({ navigation }) => {
                         placeholderTextColor="#888"
                     />
                 </View>
-                
-                <View style={styles.inputContainer}>
+
+                <View style={styles.password_inputContainer}>
                     <TextInput
                         placeholder="Password"
                         onChangeText={setPassword}
                         value={password}
                         style={styles.input}
                         placeholderTextColor="#888"
-                        secureTextEntry
-                    />
+                        secureTextEntry={secureTextEntry} />
                     <Text style={styles.mandatoryMark}>*</Text>
+
                 </View>
+                <TouchableOpacity onPress={toggleSecureTextEntry} style={styles.secureButton}>
+                    <Text style={styles.toggleText}>
+                        {secureTextEntry ? "Show" : "Hide"}
+                    </Text>
+                </TouchableOpacity>
 
                 {error ? <Text style={styles.error}>{error}</Text> : null}
                 <TouchableOpacity style={styles.signup} onPress={handleSignUp}>
@@ -116,6 +136,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
+    password_inputContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+
+    },
     input: {
         flex: 1,
         height: 45,
@@ -147,6 +173,24 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginTop: 20
     },
+    securePassword: {
+        fontSize: 15,
+        color: 'tomato',
+
+    },
+    toggleText: {
+        marginLeft: 10,
+        color: '#fff',
+    },
+    secureButton: {
+        backgroundColor: 'red',
+        height: 20,
+        width: 50,
+        borderRadius: 5,
+        alignContent: 'center',
+        bottom: 10,
+        left: 10
+    }
 });
 
 export default SignUpScreen;
