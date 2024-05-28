@@ -23,7 +23,7 @@ const SignUpScreen: React.FC = ({ navigation }) => {
 
         if (!passwordRegex.test(password)) {
             console.log(password);
-            setError('Password must contain at least one number, one capital letter, and one lowercase letter and atleast 7 digit long');
+            setError('Password must contain at least one number, one capital letter, and one lowercase letter and atleast 8 digit long');
             return;
         }
 
