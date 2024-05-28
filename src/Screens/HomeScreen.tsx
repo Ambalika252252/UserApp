@@ -1,11 +1,25 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen: React.FC = ({ navigation }: any) => {
   const route = useRoute();
   const { username, location }: any = route.params;
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('user');
+    navigation.navigate('SignIn');
+  };
 
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
@@ -69,11 +83,21 @@ const styles = StyleSheet.create({
     elevation: 5,
     alignSelf: 'center'
   },
-  buttonLabel: { 
+  buttonLabel: {
     color: "#fff",
     fontWeight: "bold",
-    fontSize: 18 
-  }
+    fontSize: 18
+  },
+  logoutButton: {
+    marginRight: 10,
+    padding: 5,
+    backgroundColor: '#FF515D',
+    borderRadius: 5,
+  },
+  logoutText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
 });
 
 export default HomeScreen;
